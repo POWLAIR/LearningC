@@ -75,23 +75,40 @@ class Program
 		}
 	}
 
+	static ConsoleKey ReadKeyFrom(ConsoleKey[] validKeys, string invalidInputText, int timeSleep)
+	{
+		ConsoleKey key;
+		do
+		{
+			ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+			key = keyInfo.Key;
+			if (!validKeys.Contains(key))
+			{
+				Console.WriteLine(invalidInputText);
+				System.Threading.Thread.Sleep(timeSleep);
+				Console.SetCursorPosition(0, Console.CursorTop - 1);
+				Console.Write(new string(' ', invalidInputText.Length));
+				Console.SetCursorPosition(0, Console.CursorTop - 1);
+			}
+		}
+		while (!validKeys.Contains(key));
+
+		return key;
+	}
+
+
 
 	static int GetDifficultyLevel()
 	{
-		while (true)
-		{
-			FillScreen(SelectLevel + "\nEnter the difficulty level (0-1): ", true);
-			if (int.TryParse(Console.ReadLine(), out int difficultyLevel) && (difficultyLevel == 0 || difficultyLevel == 1))
-			{
-				return difficultyLevel;
-			}
-			else
-			{
-				Console.WriteLine("Invalid input. Please enter 0 for easy or 1 for hard.");
-				System.Threading.Thread.Sleep(2000); // To let the user read the message.
-			}
-		}
+		Console.WriteLine(SelectLevel + "\nEnter the difficulty level (0-1): ");
+		ConsoleKey[] validKeys = { ConsoleKey.D0, ConsoleKey.D1 };
+		string InvalidInputText = "Invalid input.  Please enter 0 for easy or 1 for hard.";
+		int TimeSleep = 2000;
+		ConsoleKey selectedKey = ReadKeyFrom(validKeys, InvalidInputText, TimeSleep);
+
+		return selectedKey == ConsoleKey.D0 ? 0 : 1;
 	}
+
 
 	static bool Play(int difficultyLevel)
 	{
@@ -101,6 +118,8 @@ class Program
 		int misses = 0;
 		int moleLocation = Random.Shared.Next(1, 10);
 
+		ConsoleKey[] validSelectionKeys = { ConsoleKey.D1, ConsoleKey.D2, ConsoleKey.D3, ConsoleKey.D4, ConsoleKey.D5, ConsoleKey.D6, ConsoleKey.D7, ConsoleKey.D8, ConsoleKey.D9 };
+
 		while (DateTime.Now < end)
 		{
 			int left = CalculateLeft(moleLocation);
@@ -108,23 +127,25 @@ class Program
 			DisplayMole(JavaNoob, left, top);
 			DisplayScoreAndMisses(score, misses);
 
-			if (int.TryParse(Console.ReadKey(true).KeyChar.ToString(), out int selection) && selection >= 1 && selection <= 9)
+			string InvalidInputText = "";
+			int TimeSleep = 0;
+			ConsoleKey selectedKey = ReadKeyFrom(validSelectionKeys, InvalidInputText, TimeSleep);
+			int selection = selectedKey - ConsoleKey.D0;
+
+			DisplayMole(Empty, left, top);
+			if (moleLocation == selection)
 			{
-				DisplayMole(Empty, left, top);
-				if (moleLocation == selection)
-				{
-					score++;
-				}
-				else
-				{
-					if (difficultyLevel == 1)
-					{
-						score--;
-					}
-					misses++;
-				}
-				moleLocation = Random.Shared.Next(1, 10);
+				score++;
 			}
+			else
+			{
+				if (difficultyLevel == 1)
+				{
+					score--;
+				}
+				misses++;
+			}
+			moleLocation = Random.Shared.Next(1, 10);
 		}
 
 		FillScreen($"Game Over. Score: {score}. Misses: {misses}\n\nPress [Enter] To Continue...", true);
@@ -169,9 +190,14 @@ class Program
 
 	static bool AskToPlayAgain()
 	{
-		Console.WriteLine("\nDo you want to play again? (yes/no)");
-		string answer = Console.ReadLine().Trim().ToLower();
-		return answer.StartsWith("y");
+		Console.WriteLine("\nDo you want to play again? (Y/N)");
+		ConsoleKey[] validKeys = { ConsoleKey.Y, ConsoleKey.N };
+		string InvalidInputText = "Invalid Input";
+		int TimeSleep = 2000;
+		ConsoleKey selectedKey = ReadKeyFrom(validKeys, InvalidInputText, TimeSleep);
+
+		return selectedKey == ConsoleKey.Y;
 	}
+
 }
 
