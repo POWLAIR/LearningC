@@ -65,34 +65,22 @@ class Program
 		}
 	}
 
-	static void RunGameLoop()
-	{
-		bool continuePlaying = true;
-		while (continuePlaying)
-		{
-			int difficultyLevel = GetDifficultyLevel();
-			continuePlaying = Play(difficultyLevel);
-		}
+	static void RunGameLoop() {
+		while (Play(GetDifficultyLevel()))
+			;
 	}
-
+		
 	static ConsoleKey ReadKeyFrom(ConsoleKey[] validKeys, string invalidInputText, int timeSleep)
 	{
 		ConsoleKey key;
-		do
+		while(!validKeys.Contains(key = Console.ReadKey(true).Key))
 		{
-			ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-			key = keyInfo.Key;
-			if (!validKeys.Contains(key))
-			{
-				Console.WriteLine(invalidInputText);
-				System.Threading.Thread.Sleep(timeSleep);
-				Console.SetCursorPosition(0, Console.CursorTop - 1);
-				Console.Write(new string(' ', invalidInputText.Length));
-				Console.SetCursorPosition(0, Console.CursorTop - 1);
-			}
+			Console.WriteLine(invalidInputText);
+			System.Threading.Thread.Sleep(timeSleep);
+			Console.SetCursorPosition(0, Console.CursorTop - 1);
+			Console.Write(new string(' ', invalidInputText.Length));
+			Console.SetCursorPosition(0, Console.CursorTop );
 		}
-		while (!validKeys.Contains(key));
-
 		return key;
 	}
 
@@ -103,7 +91,7 @@ class Program
 		Console.WriteLine(SelectLevel + "\nEnter the difficulty level (0-1): ");
 		ConsoleKey[] validKeys = { ConsoleKey.D0, ConsoleKey.D1 };
 		string InvalidInputText = "Invalid input.  Please enter 0 for easy or 1 for hard.";
-		int TimeSleep = 2000;
+		int TimeSleep = 1000;
 		ConsoleKey selectedKey = ReadKeyFrom(validKeys, InvalidInputText, TimeSleep);
 
 		return selectedKey == ConsoleKey.D0 ? 0 : 1;
