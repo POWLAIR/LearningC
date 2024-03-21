@@ -6,6 +6,7 @@ class Program
 	const int WindowW = 50;
 	const int WindowH = 22;
 	const int TimePlay = 30;
+	const int TimeShoot = 500;
 	const string Board = @"
  ╔═══╦═══════╗ ╔═══╦═══════╗ ╔═══╦═══════╗
  ║ 7 ║       ║ ║ 8 ║       ║ ║ 9 ║       ║
@@ -38,6 +39,12 @@ class Program
        
        
 ";
+	const string Depop = @"
+ \ ║ /
+   - 
+   - 
+ / ║ \
+";
 
 	const string SelectLevel = @"
  ╔════════════════════════════════════════╗
@@ -65,21 +72,22 @@ class Program
 		}
 	}
 
-	static void RunGameLoop() {
+	static void RunGameLoop()
+	{
 		while (Play(GetDifficultyLevel()))
 			;
 	}
-		
+
 	static ConsoleKey ReadKeyFrom(ConsoleKey[] validKeys, string invalidInputText, int timeSleep)
 	{
 		ConsoleKey key;
-		while(!validKeys.Contains(key = Console.ReadKey(true).Key))
+		while (!validKeys.Contains(key = Console.ReadKey(true).Key))
 		{
 			Console.WriteLine(invalidInputText);
 			System.Threading.Thread.Sleep(timeSleep);
 			Console.SetCursorPosition(0, Console.CursorTop - 1);
 			Console.Write(new string(' ', invalidInputText.Length));
-			Console.SetCursorPosition(0, Console.CursorTop );
+			Console.SetCursorPosition(0, Console.CursorTop);
 		}
 		return key;
 	}
@@ -124,6 +132,9 @@ class Program
 			if (moleLocation == selection)
 			{
 				score++;
+				DisplayMole(Depop, left, top);
+				System.Threading.Thread.Sleep(TimeShoot);
+				DisplayMole(Empty, left, top);
 			}
 			else
 			{
